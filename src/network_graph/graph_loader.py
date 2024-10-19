@@ -1,5 +1,6 @@
 import networkx as nx
 import pandas as pd
+import json
 
 def create_graph(source_col: str, target_col: str, df: pd.DataFrame) -> nx.Graph:
     # Create an empty graph
@@ -63,3 +64,27 @@ def add_node_attributes(G: nx.Graph, node_col: str, attribute_col: str, df: pd.D
     
     return G
 
+def export_graph_to_csv(graph, nodes_file='nodes.csv', edges_file='edges.csv'):
+    # Export nodes with attributes
+    nodes_data = []
+    for node, attrs in graph.nodes(data=True):
+        node_data = {'node': node}
+        node_data.update(attrs)  # Add node attributes if available
+        nodes_data.append(node_data)
+    
+    # Convert nodes data to a pandas DataFrame and export to CSV
+    nodes_df = pd.DataFrame(nodes_data)
+    nodes_df.to_csv(nodes_file, index=False)
+    
+    # Export edges with attributes
+    edges_data = []
+    for u, v, attrs in graph.edges(data=True):
+        edge_data = {'source': u, 'target': v}
+        edge_data.update(attrs)  # Add edge attributes if available
+        edges_data.append(edge_data)
+    
+    # Convert edges data to a pandas DataFrame and export to CSV
+    edges_df = pd.DataFrame(edges_data)
+    edges_df.to_csv(edges_file, index=False)
+
+    print(f'Graph exported: {nodes_file} (nodes), {edges_file} (edges)')
