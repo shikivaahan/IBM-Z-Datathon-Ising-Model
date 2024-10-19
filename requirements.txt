@@ -1,0 +1,6 @@
+pandas
+os
+praw
+python-dotenv
+networkx
+transformers
