@@ -1,6 +1,5 @@
-import networkx as nx
 import pandas as pd
-import json
+import networkx as nx
 
 def create_graph(source_col: str, target_col: str, df: pd.DataFrame) -> nx.Graph:
     # Create an empty graph
@@ -88,3 +87,5 @@ def export_graph_to_csv(graph, nodes_file='nodes.csv', edges_file='edges.csv'):
     edges_df.to_csv(edges_file, index=False)
 
     print(f'Graph exported: {nodes_file} (nodes), {edges_file} (edges)')
+
+

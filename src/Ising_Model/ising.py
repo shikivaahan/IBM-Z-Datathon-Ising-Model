@@ -74,23 +74,3 @@ def run_ising_model_analysis(graph, J=1.0, threshold=0.5):
     for node, energy in susceptible_nodes.items():
         print(f"User {node}: Energy = {energy:.4f}")
 
-# Example usage
-if __name__ == "__main__":
-    # Create a directed graph
-    G = nx.DiGraph()
-
-    # Example user interactions (replace with real data from the top 10 posts)
-    G.add_nodes_from([
-        (1, {'behavior': +1}),
-        (2, {'behavior': -1}),
-        (3, {'behavior': +1}),
-        (4, {'behavior': -1}),
-        (5, {'behavior': +1}),
-    ])
-
-    G.add_edges_from([
-        (1, 2), (2, 3), (3, 4), (4, 5), (5, 1),  # Example interactions
-    ])
-
-    # Run the Ising model analysis
-    run_ising_model_analysis(G, J=1.0, threshold=0.5)
