@@ -26,7 +26,7 @@ def fetch_comments(post, reddit):
 
     comments_data = []
     post_author = post.author.name if post.author else "[deleted]"  # Get the post author's username
-    post_timestamp = datetime.utcfromtimestamp(post.created_utc).strftime('%Y-%m-%d %H:%M:%S')  # Convert timestamp to readable format
+    post_timestamp = datetime.utcfromtimestamp(post.created_utc).strftime("%Y-%m-%d %H:%M:%S")  # Convert timestamp to readable format
 
     # Iterate over all the comments
     for comment in post.comments.list():
