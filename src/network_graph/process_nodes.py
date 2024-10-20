@@ -1,6 +1,7 @@
 import networkx as nx
+import pandas as pd
 
-def process_nodes(G: nx.Graph, df: pd.DataFrame, node_col: str, spin_col: str) -> nx.Graph:
+def process_nodes(G: nx.Graph, df: pd.DataFrame, node_col: str, label_col: str) -> nx.Graph:
     """
     Assigns spin values to the nodes in the graph G based on a DataFrame.
     
@@ -17,11 +18,11 @@ def process_nodes(G: nx.Graph, df: pd.DataFrame, node_col: str, spin_col: str) -
     # Iterate through each row in the DataFrame
     for _, row in df.iterrows():
         node = row[node_col]
-        spin_value = row[spin_col]
+        label_value = row[label_col]
         
         # Check if the node exists in the graph
         if node in G:
             # Assign the spin value as an attribute to the node
-            G.nodes[node]['spin'] = spin_value
+            G.nodes[node]['spin'] = label_value
     
     return G
