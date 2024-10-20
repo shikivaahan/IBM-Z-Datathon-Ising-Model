@@ -1,16 +1,25 @@
-import networkx as nx
 import matplotlib.pyplot as plt
+import networkx as nx
 
-def visualise_graph(G: nx.Graph, node_color='lightblue', node_size=500, with_labels=True, layout='spring'):
+def visualise_graph(G: nx.Graph, color_by: str = 'label', node_size: int = 500, 
+                    with_labels: bool = True, layout: str = 'spring') -> None:
     """
-    Visualizes the graph using NetworkX and Matplotlib.
-    
+    Visualizes the graph using NetworkX and Matplotlib, coloring nodes based on a specified attribute.
+
     Parameters:
-    - G: nx.Graph, the graph to be visualized.
-    - node_color: str or list, color of the nodes.
-    - node_size: int or list, size of the nodes.
-    - with_labels: bool, whether to display node labels.
-    - layout: str, the layout algorithm to use ('spring', 'circular', 'random', 'shell', etc.).
+    - G (nx.Graph): The graph to be visualized.
+    - color_by (str, optional): Attribute to color the nodes by. 
+                                 Options are 'label' (coloring based on label values) or 
+                                 'community' (coloring based on community assignment). 
+                                 Default is 'label'.
+    - node_size (int, optional): Size of the nodes. Default is 500.
+    - with_labels (bool, optional): Whether to display node labels. Default is True.
+    - layout (str, optional): The layout algorithm to use for positioning the nodes. 
+                              Options include 'spring', 'circular', 'random', 'shell', etc. 
+                              Default is 'spring'.
+
+    Returns:
+    - None: This function displays the graph visualization and does not return any value.
     """
     
     # Choose layout
@@ -24,6 +33,21 @@ def visualise_graph(G: nx.Graph, node_color='lightblue', node_size=500, with_lab
         pos = nx.shell_layout(G)  # Shell layout
     else:
         pos = nx.spring_layout(G)  # Default to spring layout if unrecognized layout
+
+    # Determine node colors based on the specified attribute
+    if color_by == 'label':
+        node_color = ['green' if G.nodes[node].get('label', [0])[0] == 1 else 'red' for node in G.nodes()]
+    elif color_by == 'community':
+        # Assign a unique color to each community
+        communities = {community: idx for idx, community in enumerate(set(nx.get_node_attributes(G, 'community').values()))}
+        # Get the number of unique communities to define the colormap
+        num_communities = len(communities)
+        colormap = plt.cm.tab10  # Use the tab10 colormap
+        
+        # Assign colors based on the community index
+        node_color = [colormap(idx % num_communities) for node in G.nodes() for idx in [communities[G.nodes[node].get('community', 0)]]]
+    else:
+        node_color = 'lightblue'  # Default color if unrecognized attribute
 
     # Draw the graph
     plt.figure(figsize=(24, 18))  # You can adjust the figure size as needed
