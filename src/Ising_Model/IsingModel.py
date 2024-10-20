@@ -13,6 +13,8 @@ class IsingModel:
         graph (networkx.Graph): The input graph representing the social network.
         n_nodes (int): The number of nodes in the graph.
         spins (numpy.ndarray): An array representing the spin states of the nodes.
+        node_to_idx (dict): A dictionary mapping graph nodes to integer indices.
+        idx_to_node (dict): A dictionary mapping integer indices to graph nodes.
     """
 
     def __init__(self, graph: nx.Graph) -> None:
@@ -24,6 +26,11 @@ class IsingModel:
         """
         self.graph = graph
         self.n_nodes = len(graph.nodes())
+
+        # Create mappings between node labels and integer indices
+        self.node_to_idx = {node: idx for idx, node in enumerate(graph.nodes())}
+        self.idx_to_node = {idx: node for node, idx in self.node_to_idx.items()}
+
         self.spins = np.random.choice([-1, 1], size=self.n_nodes)
 
     def calculate_energy(self) -> float:
@@ -37,8 +44,9 @@ class IsingModel:
         edges = np.array(self.graph.edges())
         
         for edge in edges:
-            s1 = self.spins[edge[0]]
-            s2 = self.spins[edge[1]]
+            # Get integer indices for the nodes
+            s1 = self.spins[self.node_to_idx[edge[0]]]
+            s2 = self.spins[self.node_to_idx[edge[1]]]
             energy -= s1 * s2  # Interaction energy
             
         return energy
@@ -135,4 +143,6 @@ class IsingModel:
         plt.ylabel(quantity_name)
         plt.grid(True)
         plt.show()
+
+
 
