@@ -2,6 +2,8 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
+from typing import List, Tuple
+from tqdm import tqdm  # For the progress bar
 
 class IsingModel:
     """
@@ -13,7 +15,7 @@ class IsingModel:
         spins (numpy.ndarray): An array representing the spin states of the nodes.
     """
 
-    def __init__(self, graph):
+    def __init__(self, graph: nx.Graph) -> None:
         """
         Initializes the Ising model with a graph and assigns random spins.
 
@@ -24,7 +26,7 @@ class IsingModel:
         self.n_nodes = len(graph.nodes())
         self.spins = np.random.choice([-1, 1], size=self.n_nodes)
 
-    def calculate_energy(self):
+    def calculate_energy(self) -> float:
         """
         Calculate the total energy of the Ising model for the current spin configuration.
 
@@ -41,7 +43,7 @@ class IsingModel:
             
         return energy
 
-    def calculate_magnetization(self):
+    def calculate_magnetization(self) -> float:
         """
         Calculate the total magnetization of the Ising model.
 
@@ -50,7 +52,7 @@ class IsingModel:
         """
         return np.sum(self.spins)
 
-    def flip_spin(self, node):
+    def flip_spin(self, node: int) -> None:
         """
         Flip the spin of the specified node in the graph.
 
@@ -59,7 +61,7 @@ class IsingModel:
         """
         self.spins[node] *= -1
 
-    def monte_carlo_step(self, temperature):
+    def monte_carlo_step(self, temperature: float) -> None:
         """
         Perform a single Monte Carlo step using the Metropolis algorithm for the Ising model.
 
@@ -80,25 +82,26 @@ class IsingModel:
             if delta_energy > 0 and random.random() >= np.exp(-delta_energy / temperature):
                 self.flip_spin(node)  # Flip back if not accepted
 
-    def simulate(self, temperatures, steps_per_temperature):
+    def simulate(self, temperatures: np.ndarray, steps_per_temperature: int) -> Tuple[List[float], List[float], List[float]]:
         """
-        Simulate the Ising model for a range of temperatures and return energy and magnetization data.
+        Simulate the Ising model for a range of temperatures and return energy, magnetization, and correlation data.
 
         Args:
-            temperatures (list or ndarray): A list or array of temperatures to simulate.
+            temperatures (np.ndarray): An array of temperatures to simulate.
             steps_per_temperature (int): The number of Monte Carlo steps for each temperature.
 
         Returns:
-            tuple: A tuple of three lists: 
-                - energy_data: The average energy at each temperature.
-                - magnetization_data: The average magnetization at each temperature.
-                - correlation_data: The average spin values (correlations) at each temperature.
+            Tuple: A tuple of three lists: 
+                - energy_data (List[float]): The average energy at each temperature.
+                - magnetization_data (List[float]): The average magnetization at each temperature.
+                - correlation_data (List[float]): The average spin values (correlations) at each temperature.
         """
         energy_data = []
         magnetization_data = []
         correlation_data = []
 
-        for temp in temperatures:
+        # Using tqdm for a progress bar
+        for temp in tqdm(temperatures, desc="Simulating", unit="temperature"):
             self.spins = np.random.choice([-1, 1], size=self.n_nodes)  # Reset spins for each temperature
             
             for _ in range(steps_per_temperature):
@@ -116,13 +119,13 @@ class IsingModel:
         return energy_data, magnetization_data, correlation_data
 
     @staticmethod
-    def plot_quantity_vs_temperature(quantity_data, temperatures, quantity_name):
+    def plot_quantity_vs_temperature(quantity_data: List[float], temperatures: np.ndarray, quantity_name: str) -> None:
         """
         Plot a physical quantity (e.g., energy, magnetization) against temperature.
 
         Args:
-            quantity_data (list): A list of average quantity values for each temperature.
-            temperatures (list or ndarray): A list or array of temperatures.
+            quantity_data (List[float]): A list of average quantity values for each temperature.
+            temperatures (np.ndarray): An array of temperatures.
             quantity_name (str): The name of the quantity to plot.
         """
         plt.figure(figsize=(10, 6))
