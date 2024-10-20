@@ -1,4 +1,4 @@
 .env
 venv
 src/Sentiment/sentiment_model
-__pycache__
+__pycache__/
