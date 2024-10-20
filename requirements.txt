@@ -4,3 +4,5 @@ python-dotenv
 networkx
 transformers
 numpy
+matplotlib
+python-louvain
