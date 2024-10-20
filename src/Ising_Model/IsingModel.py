@@ -143,6 +143,3 @@ class IsingModel:
         plt.ylabel(quantity_name)
         plt.grid(True)
         plt.show()
-
-
-

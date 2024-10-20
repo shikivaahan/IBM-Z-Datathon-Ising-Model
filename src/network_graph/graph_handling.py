@@ -1,5 +1,6 @@
 import pandas as pd
 import networkx as nx
+from typing import Tuple
 
 def create_graph(source_col: str, target_col: str, df: pd.DataFrame) -> nx.Graph:
     # Create an empty graph
@@ -63,6 +64,43 @@ def add_node_attributes(G: nx.Graph, node_col: str, attribute_col: str, df: pd.D
     
     return G
 
+def add_edge_attributes(G: nx.Graph, edge_col: Tuple[str, str], attribute_col: str, df: pd.DataFrame) -> nx.Graph:
+    """
+    Adds attributes (e.g., timestamps) to edges in a graph G based on edge_col and attribute_col from a DataFrame.
+    If the attribute already exists for the edge, it appends the new attribute to a list.
+    
+    Parameters:
+    - G: nx.Graph, the graph to which attributes will be added.
+    - edge_col: tuple of str, the two columns in the DataFrame representing the source and target nodes of the edges.
+    - attribute_col: str, the column in the DataFrame representing the attributes (e.g., timestamps) to assign to edges.
+    - df: pd.DataFrame, the DataFrame containing edge and attribute data.
+    
+    Returns:
+    - G: nx.Graph, the graph with appended edge attributes.
+    """
+    
+    # Iterate through each row in the DataFrame
+    for _, row in df.iterrows():
+        node1 = row[edge_col[0]]
+        node2 = row[edge_col[1]]
+        attribute = row[attribute_col]
+        
+        # Check if the edge exists in the graph
+        if G.has_edge(node1, node2):
+            # If the edge already has the attribute, append it to the list
+            if attribute_col in G.edges[node1, node2]:
+                if isinstance(G.edges[node1, node2][attribute_col], list):
+                    # Append to the list if the attribute is already a list
+                    G.edges[node1, node2][attribute_col].append(attribute)
+                else:
+                    # Convert the existing attribute to a list and append the new one
+                    G.edges[node1, node2][attribute_col] = [G.edges[node1, node2][attribute_col], attribute]
+            else:
+                # If the attribute doesn't exist, add it as a single item
+                G.edges[node1, node2][attribute_col] = [attribute]
+    
+    return G
+
 
 def export_graph_to_csv(graph: nx.Graph, nodes_file: str = 'nodes.csv', edges_file: str = 'edges.csv') -> None:
     """
@@ -79,7 +117,7 @@ def export_graph_to_csv(graph: nx.Graph, nodes_file: str = 'nodes.csv', edges_fi
     The nodes CSV will include each node's identifier and its associated attributes as columns. 
     If a node does not have a specific attribute, that column will contain NaN values.
     
-    The edges CSV will include the source and target nodes for each edge and any associated edge attributes.
+    The edges CSV will include the source and target nodes for each edge, the datetime, and any associated edge attributes.
     """
     # Export nodes with attributes
     nodes_data = []
@@ -97,11 +135,15 @@ def export_graph_to_csv(graph: nx.Graph, nodes_file: str = 'nodes.csv', edges_fi
     # Export nodes to CSV
     nodes_df.to_csv(nodes_file, index=False)
 
-    # Export edges with attributes
+    # Export edges with attributes including datetime
     edges_data = []
     for u, v, attrs in graph.edges(data=True):
-        edge_data = {'source': u, 'target': v}
-        edge_data.update(attrs)  # Add edge attributes if available
+        edge_data = {
+            'source': u,
+            'target': v,
+            'datetime': attrs.get('datetime')  # Add 'datetime' if it exists, otherwise None
+        }
+        edge_data.update(attrs)  # Add other edge attributes if available
         edges_data.append(edge_data)
 
     # Convert edges data to a pandas DataFrame
@@ -113,6 +155,6 @@ def export_graph_to_csv(graph: nx.Graph, nodes_file: str = 'nodes.csv', edges_fi
     # Export edges to CSV
     edges_df.to_csv(edges_file, index=False)
 
-    print(f'Graph exported: {nodes_file} (nodes), {edges_file} (edges)')
+    print(f'Graph exported: {nodes_file} (nodes), {edges_file} (edges with datetime)')
 
 
