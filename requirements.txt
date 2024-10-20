@@ -4,3 +4,4 @@ python-dotenv
 networkx
 transformers
 numpy
+cupy
